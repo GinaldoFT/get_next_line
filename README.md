@@ -8,7 +8,7 @@
 This project is part of the 42 school curriculum and focuses on low-level file I/O, memory management, and the use of static variables.
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/GinaldoFT/GinaldoFT/main/42Badges/get_next_linen.png" width="100" alt="get_next_line badge"/>
+  <img src="https://raw.githubusercontent.com/GinaldoFT/GinaldoFT/main/42Badges/get_next_linee.png" width="100" alt="get_next_line badge"/>
 </p>
 
 ---
