@@ -1,6 +1,0 @@
-1. Criar uma funcao que abra e leia um arquivo.
-
-2. Ler o conteudo até achar o \n.
-
-3. Criar funcoes auxiliares strlen, strchr, strdup, strjoin.
-
