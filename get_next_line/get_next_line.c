@@ -6,44 +6,104 @@
 /*   By: ginfranc <ginfranc@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/24 10:35:02 by ginfranc          #+#    #+#             */
-/*   Updated: 2025/04/24 10:36:05 by ginfranc         ###   ########.fr       */
+/*   Updated: 2025/04/25 19:34:41 by ginfranc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-char	*get_next_line(int fd)
+static void	free_ptr(char **ptr)
 {
-	static char	buffer[BUFFER_SIZE + 1];
-	char		*line;
-	ssize_t		bytes_read;
+	if (*ptr)
+	{
+		free(*ptr);
+		*ptr = NULL;
+	}
+}
+
+static char	*extract_line(char **backup)
+{
+	char	*line;
+	char	*next;
 	int		i;
 
 	i = 0;
-	line = malloc(BUFFER_SIZE + 1);
+	while ((*backup)[i] && (*backup)[i] != '\n')
+		i++;
+	if ((*backup)[i] == '\n')
+		i++;
+	line = ft_substr(*backup, 0, i);
 	if (!line)
-        return (NULL);
-
-	bytes_read = read(fd, buffer, BUFFER_SIZE);
-	if (bytes_read <= 0)
 	{
-		free(line);
+		free_ptr(backup);
 		return (NULL);
 	}
-
-	while (i < bytes_read && buffer[i] != '\n')
+	next = ft_strdup(*backup + i);
+	free_ptr(backup);
+	if (!next || !*line)
 	{
-		line[i] = buffer[i];
-		i++;
+		free_ptr(&line);
+		free_ptr(&next);
+		return (NULL);
 	}
-
-	if (buffer[i] == '\n')
-		line[i++] = '\n';
-
-	line[i] = '\0';
+	*backup = next;
 	return (line);
 }
 
+static int	read_into_backup(int fd, char **buffer, char **backup)
+{
+	char	*tmp;
+	int		bytes;
+
+	bytes = 1;
+	while (!ft_strchr(*backup, '\n') && bytes > 0)
+	{
+		bytes = read(fd, *buffer, BUFFER_SIZE);
+		if (bytes < 0)
+			return (-1);
+		(*buffer)[bytes] = '\0';
+		tmp = *backup;
+		*backup = ft_strjoin(tmp, *buffer);
+		free_ptr(&tmp);
+		if (!*backup)
+			return (-1);
+	}
+	return (0);
+}
+
+char	*get_next_line(int fd)
+{
+	static char	*backup;
+	char		*buffer;
+
+	if (fd < 0 || fd >= 1024 || BUFFER_SIZE <= 0)
+		return (NULL);
+	buffer = malloc(BUFFER_SIZE + 1);
+	if (!buffer || read(fd, buffer, 0) < 0)
+	{
+		free_ptr(&buffer);
+		free_ptr(&backup);
+		return (NULL);
+	}
+	if (!backup)
+		backup = ft_strdup("");
+	if (!backup || read_into_backup(fd, &buffer, &backup) == -1)
+	{
+		free_ptr(&buffer);
+		free_ptr(&backup);
+		return (NULL);
+	}
+	free_ptr(&buffer);
+	if (!*backup)
+	{
+		free_ptr(&backup);
+		return (NULL);
+	}
+	return (extract_line(&backup));
+}
+
+
+/*
 #include <stdio.h>
 
 int	main(int ac, char *av[])
@@ -64,4 +124,4 @@ int	main(int ac, char *av[])
 	}
 	return (0);
 }
-
+*/
