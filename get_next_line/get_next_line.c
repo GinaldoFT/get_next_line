@@ -6,7 +6,7 @@
 /*   By: ginfranc <ginfranc@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/24 10:35:02 by ginfranc          #+#    #+#             */
-/*   Updated: 2025/04/25 19:34:41 by ginfranc         ###   ########.fr       */
+/*   Updated: 2025/04/26 09:32:46 by ginfranc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,22 @@ static int	read_into_backup(int fd, char **buffer, char **backup)
 	return (0);
 }
 
+static int	test(int fd, char **backup, char **buffer)
+{
+	int	i;
+
+	i = 0;
+	if (!*backup)
+		*backup = ft_strdup("");
+	if (!*backup || read_into_backup(fd, &*buffer, &*backup) == -1)
+	{
+		free_ptr(&*buffer);
+		free_ptr(&*backup);
+		i++;
+	}
+	return (i);
+}
+
 char	*get_next_line(int fd)
 {
 	static char	*backup;
@@ -85,14 +101,8 @@ char	*get_next_line(int fd)
 		free_ptr(&backup);
 		return (NULL);
 	}
-	if (!backup)
-		backup = ft_strdup("");
-	if (!backup || read_into_backup(fd, &buffer, &backup) == -1)
-	{
-		free_ptr(&buffer);
-		free_ptr(&backup);
+	if (test(fd, &backup, &buffer) != 0)
 		return (NULL);
-	}
 	free_ptr(&buffer);
 	if (!*backup)
 	{
@@ -101,7 +111,6 @@ char	*get_next_line(int fd)
 	}
 	return (extract_line(&backup));
 }
-
 
 /*
 #include <stdio.h>
@@ -114,11 +123,13 @@ int	main(int ac, char *av[])
 
 	if (ac != 2)
 		return (1);
-	n = 4;
+	n = 1;
 	fd = (int)open(av[1], O_RDONLY);
-	while (--n > 0)
+	while(1)
 	{
 		text = get_next_line(fd);
+		if (!text)
+			return (0);
 		printf("%s", text);
 		free(text);
 	}
