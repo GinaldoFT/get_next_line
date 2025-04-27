@@ -6,7 +6,7 @@
 /*   By: ginfranc <ginfranc@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/24 10:36:44 by ginfranc          #+#    #+#             */
-/*   Updated: 2025/04/25 19:18:36 by ginfranc         ###   ########.fr       */
+/*   Updated: 2025/04/27 14:56:53 by ginfranc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,6 @@
 
 # include <unistd.h>
 # include <stdlib.h>
-# include <fcntl.h>
 
 char	*get_next_line(int fd);
 size_t	ft_strlen(const char *str);

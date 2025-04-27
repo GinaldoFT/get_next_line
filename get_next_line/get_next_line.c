@@ -6,7 +6,7 @@
 /*   By: ginfranc <ginfranc@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/24 10:35:02 by ginfranc          #+#    #+#             */
-/*   Updated: 2025/04/26 13:39:46 by ginfranc         ###   ########.fr       */
+/*   Updated: 2025/04/27 14:56:04 by ginfranc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,19 +113,18 @@ char	*get_next_line(int fd)
 }
 
 /*
+#include <fcntl.h>
 #include <stdio.h>
 
 int	main(int ac, char *av[])
 {
 	int	fd;
 	char	*text;
-	int	n;
 
 	if (ac != 2)
-		return (1);
-	n = 1;
-	fd = (int)open(av[1], O_RDONLY);
-	while(1)
+		return (0);
+	fd = open(av[1], O_RDONLY);
+	while (1)
 	{
 		text = get_next_line(fd);
 		if (!text)
@@ -133,6 +132,7 @@ int	main(int ac, char *av[])
 		printf("%s", text);
 		free(text);
 	}
+	close(fd);
 	return (0);
 }
 */
