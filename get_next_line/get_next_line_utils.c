@@ -6,7 +6,7 @@
 /*   By: ginfranc <ginfranc@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/25 19:10:03 by ginfranc          #+#    #+#             */
-/*   Updated: 2025/04/27 14:56:50 by ginfranc         ###   ########.fr       */
+/*   Updated: 2025/05/01 12:07:36 by ginfranc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,25 +40,6 @@ char	*ft_strchr(const char *s, int c)
 	return (NULL);
 }
 
-char	*ft_strdup(const char *s)
-{
-	char	*str;
-	int		i;
-
-	i = (int)ft_strlen(s);
-	str = (char *)malloc(i + 1);
-	if (!str)
-		return (NULL);
-	i = 0;
-	while (s[i] != '\0')
-	{
-		str[i] = s[i];
-		i++;
-	}
-	str[i] = '\0';
-	return (str);
-}
-
 char	*ft_substr(char const *s, unsigned int start, size_t len)
 {
 	char	*str;
@@ -69,7 +50,7 @@ char	*ft_substr(char const *s, unsigned int start, size_t len)
 		return (NULL);
 	rlen = ft_strlen(s);
 	if (start >= rlen)
-		return (ft_strdup(""));
+		return (NULL);
 	rlen -= start;
 	if (rlen > len)
 		rlen = len;
@@ -92,7 +73,7 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	int		j;
 	char	*str;
 
-	if (!s1 || !s2)
+	if (!s1 && !s2)
 		return (NULL);
 	i = ft_strlen(s1);
 	j = ft_strlen(s2);
@@ -111,4 +92,27 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	}
 	str[i] = '\0';
 	return (str);
+}
+
+size_t	ft_strlcpy(char *dest, const char *src, size_t size)
+{
+	size_t	i;
+
+	i = 0;
+	if (size == 0)
+	{
+		while (src[i] != '\0')
+			i++;
+		return (i);
+	}
+	while (i < size - 1 && src[i] != '\0')
+	{
+		dest[i] = src[i];
+		i++;
+	}
+	if (i < size)
+		dest[i] = '\0';
+	while (src[i] != '\0')
+		i++;
+	return (i);
 }

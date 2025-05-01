@@ -6,7 +6,7 @@
 /*   By: ginfranc <ginfranc@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/24 10:35:02 by ginfranc          #+#    #+#             */
-/*   Updated: 2025/04/27 14:56:04 by ginfranc         ###   ########.fr       */
+/*   Updated: 2025/05/01 17:20:56 by ginfranc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,10 +21,9 @@ static void	free_ptr(char **ptr)
 	}
 }
 
-static char	*extract_line(char **backup)
+static char	*extract_line(char **backup, char buffer[])
 {
 	char	*line;
-	char	*next;
 	int		i;
 
 	i = 0;
@@ -38,19 +37,12 @@ static char	*extract_line(char **backup)
 		free_ptr(backup);
 		return (NULL);
 	}
-	next = ft_strdup(*backup + i);
+	ft_strlcpy(buffer, *backup + i, ft_strlen(*backup + i) + 1);
 	free_ptr(backup);
-	if (!next || !*line)
-	{
-		free_ptr(&line);
-		free_ptr(&next);
-		return (NULL);
-	}
-	*backup = next;
 	return (line);
 }
 
-static int	read_into_backup(int fd, char **buffer, char **backup)
+static int	read_into_backup(int fd, char buffer[], char **backup)
 {
 	char	*tmp;
 	int		bytes;
@@ -58,12 +50,12 @@ static int	read_into_backup(int fd, char **buffer, char **backup)
 	bytes = 1;
 	while (!ft_strchr(*backup, '\n') && bytes > 0)
 	{
-		bytes = read(fd, *buffer, BUFFER_SIZE);
-		if (bytes < 0)
-			return (-1);
-		(*buffer)[bytes] = '\0';
+		bytes = read(fd, buffer, BUFFER_SIZE);
+		if (bytes <= 0)
+			return (bytes);
+		buffer[bytes] = '\0';
 		tmp = *backup;
-		*backup = ft_strjoin(tmp, *buffer);
+		*backup = ft_strjoin(tmp, buffer);
 		free_ptr(&tmp);
 		if (!*backup)
 			return (-1);
@@ -71,45 +63,29 @@ static int	read_into_backup(int fd, char **buffer, char **backup)
 	return (0);
 }
 
-static int	test(int fd, char **backup, char **buffer)
-{
-	int	i;
-
-	i = 0;
-	if (!*backup)
-		*backup = ft_strdup("");
-	if (!*backup || read_into_backup(fd, &*buffer, &*backup) == -1)
-	{
-		free_ptr(&*buffer);
-		free_ptr(&*backup);
-		i++;
-	}
-	return (i);
-}
-
 char	*get_next_line(int fd)
 {
-	static char	*backup;
-	char		*buffer;
+	char		*backup;
+	static char	buffer[BUFFER_SIZE + 1];
 
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
-	buffer = malloc(BUFFER_SIZE + 1);
-	if (!buffer || read(fd, buffer, 0) < 0)
+	backup = malloc(ft_strlen(buffer) + 1);
+	if (!backup)
+		return (NULL);
+	ft_strlcpy(backup, buffer, ft_strlen(buffer) + 1);
+	buffer[0] = '\0';
+	if (read_into_backup(fd, buffer, &backup) == -1)
 	{
-		free_ptr(&buffer);
 		free_ptr(&backup);
 		return (NULL);
 	}
-	if (test(fd, &backup, &buffer) != 0)
-		return (NULL);
-	free_ptr(&buffer);
 	if (!*backup)
 	{
 		free_ptr(&backup);
 		return (NULL);
 	}
-	return (extract_line(&backup));
+	return (extract_line(&backup, buffer));
 }
 
 /*
@@ -128,7 +104,7 @@ int	main(int ac, char *av[])
 	{
 		text = get_next_line(fd);
 		if (!text)
-			return (0);
+			break;
 		printf("%s", text);
 		free(text);
 	}
